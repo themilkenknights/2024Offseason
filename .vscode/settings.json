@@ -36,6 +36,12 @@
     "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle"
   },
   "[java]": {
-    "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle"
-  }
+    "editor.defaultFormatter": "redhat.java"
+  },
+  "cSpell.words": [
+    "Beambreak",
+    "GROUNDOUT",
+    "Intaking",
+    "OUTTAKING"
+  ]
 }
