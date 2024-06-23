@@ -1,6 +1,7 @@
 package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +28,25 @@ public class NoteVisuals extends SubsystemBase {
       this.pose = pose;
       this.id = visualNotes.size();
       visualNotes.add(this);
+      timer.stop();
+    }
+
+    // public VisualNote(Pose3d pose, double ttl) {
+    //   this.pose = pose;
+    //   this.id = visualNotes.size();
+    //   this.ttl = ttl;
+    //   visualNotes.add(this);
+    //   timer.start();
+    // }
+
+    boolean shouldDestroy() {
+      return timer.hasElapsed(ttl);
     }
 
     Pose3d pose;
     int id;
+    Timer timer = new Timer();
+    double ttl = 15;
 
     public Pose3d getPose() {
       return pose;
@@ -51,6 +67,8 @@ public class NoteVisuals extends SubsystemBase {
 
     Pose3d[] poses =
         visualNotes.stream().filter(Objects::nonNull).map(n -> n.getPose()).toArray(Pose3d[]::new);
+    visualNotes =
+        visualNotes.stream().filter(Objects::nonNull).filter(VisualNote::shouldDestroy).toList();
     Logger.recordOutput("NoteVisualizer/Notes", poses);
   }
 
