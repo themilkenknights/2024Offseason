@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import org.littletonrobotics.junction.Logger;
 
@@ -21,7 +20,7 @@ public class NoteVisuals extends SubsystemBase {
     return instance;
   }
 
-  private static List<VisualNote> visualNotes = new ArrayList<>();
+  private static ArrayList<VisualNote> visualNotes = new ArrayList<>();
 
   public static class VisualNote {
     public VisualNote(Pose3d pose) {
@@ -68,7 +67,11 @@ public class NoteVisuals extends SubsystemBase {
     Pose3d[] poses =
         visualNotes.stream().filter(Objects::nonNull).map(n -> n.getPose()).toArray(Pose3d[]::new);
     visualNotes =
-        visualNotes.stream().filter(Objects::nonNull).filter(VisualNote::shouldDestroy).toList();
+        new ArrayList<>(
+            visualNotes.stream()
+                .filter(Objects::nonNull)
+                .filter(VisualNote::shouldDestroy)
+                .toList());
     Logger.recordOutput("NoteVisualizer/Notes", poses);
   }
 
