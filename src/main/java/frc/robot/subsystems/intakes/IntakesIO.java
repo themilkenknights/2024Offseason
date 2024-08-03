@@ -8,13 +8,16 @@ public interface IntakesIO {
     public boolean beambreak;
 
     public double topAppliedVolts = 0.0;
-    public double[] topCurrentAmps = new double[] {};
+    public double topTorqueCurrentAmps = 0;
+    public double topSupplyCurrentAmps = 0;
 
     public double midAppliedVolts = 0.0;
-    public double[] midCurrentAmps = new double[] {};
+    public double midTorqueCurrentAmps = 0;
+    public double midSupplyCurrentAmps = 0;
 
     public double groundAppliedVolts = 0.0;
-    public double[] groundCurrentAmps = new double[] {};
+    public double groundTorqueCurrentAmps = 0;
+    public double groundSupplyCurrentAmps = 0;
   }
 
   /** Updates the set of loggable inputs. */

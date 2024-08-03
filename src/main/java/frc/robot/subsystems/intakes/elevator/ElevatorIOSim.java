@@ -1,7 +1,9 @@
 package frc.robot.subsystems.intakes.elevator;
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 
 public class ElevatorIOSim implements ElevatorIO {
   private ElevatorSim elevatorSim =
@@ -13,8 +15,17 @@ public class ElevatorIOSim implements ElevatorIO {
     elevatorSim.update(0.02);
     inputs.encoderValue = elevatorSim.getPositionMeters() * 40 * 5.714;
     inputs.leftAppliedVolts = lv;
-    // inputs.leftCurrentAmps[0] = elevatorSim.getCurrentDrawAmps();
-    // inputs.rightCurrentAmps[0] = elevatorSim.getCurrentDrawAmps();
+    inputs.rightAppliedVolts = lv;
+
+    // SimBattery estimates loaded battery voltages
+    RoboRioSim.setVInVoltage(
+        BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
+
+    inputs.leftTorqueCurrentAmps = elevatorSim.getCurrentDrawAmps();
+    inputs.leftSupplyCurrentAmps = RoboRioSim.getVInCurrent();
+
+    inputs.rightTorqueCurrentAmps = elevatorSim.getCurrentDrawAmps();
+    inputs.rightSupplyCurrentAmps = RoboRioSim.getVInCurrent();
   }
 
   @Override

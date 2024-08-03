@@ -33,7 +33,7 @@
   "spotlessGradle.diagnostics.enable": false,
   "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle",
   "[json]": {
-    "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle"
+    "editor.defaultFormatter": "vscode.json-language-features"
   },
   "[java]": {
     "editor.defaultFormatter": "redhat.java"
@@ -42,6 +42,7 @@
     "Beambreak",
     "GROUNDOUT",
     "Intaking",
-    "OUTTAKING"
+    "OUTTAKING",
+    "Robo"
   ]
 }

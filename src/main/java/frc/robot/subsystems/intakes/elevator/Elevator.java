@@ -4,6 +4,8 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -77,6 +79,8 @@ public class Elevator extends SubsystemBase {
     return setGoal(Positions.GROUND);
   }
 
+  double lHeight;
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -89,6 +93,35 @@ public class Elevator extends SubsystemBase {
 
     stage.setLength((inputs.encoderValue / Math.PI) / 40); // +0.3);
     SmartDashboard.putData(mech);
+    Pose3d midStagePose = new Pose3d();
+    boolean up = inputs.leftAppliedVolts >= 0.4;
+    // pidController.getSetpoint().position <= pidController.getGoal().position|
+    // pidController.atGoal();
+
+    if (inputs.encoderValue > 60 & up) {
+      if ((((inputs.encoderValue - 70) / Math.PI) / 80) >= lHeight) {
+        midStagePose =
+            new Pose3d(0, 0, (((inputs.encoderValue - 70) / Math.PI) / 80), new Rotation3d());
+        lHeight = (((inputs.encoderValue - 70) / Math.PI) / 80);
+      } else {
+        midStagePose = new Pose3d(0, 0, lHeight, new Rotation3d());
+      }
+    } else if (inputs.encoderValue > 60) {
+      midStagePose = new Pose3d(0, 0, lHeight, new Rotation3d());
+    } else if (inputs.encoderValue < 60) {
+      midStagePose = new Pose3d(0, 0, (((inputs.encoderValue) / Math.PI) / 80), new Rotation3d());
+      lHeight = (((inputs.encoderValue + 80) / Math.PI) / 80);
+    }
+    if (up & !(inputs.encoderValue > 60)) {
+      midStagePose = new Pose3d();
+      lHeight = 0;
+    }
+
+    Logger.recordOutput(
+        "Elevator",
+        midStagePose,
+        new Pose3d(0, 0, (inputs.encoderValue / Math.PI) / 80, new Rotation3d()),
+        new Pose3d()); // new Pose3d(0, 0, (inputs.encoderValue / Math.PI) / 160, new Rotation3d())
   }
 
   public double getPositionError() {

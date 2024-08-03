@@ -34,4 +34,17 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+
+  public static class IntakeElevator {
+    public static class Intakes {
+      public static final int topIntakeCANID = 22;
+      public static final int midIntakeCANID = 27;
+      public static final int bottomIntakeCANID = 23;
+    }
+
+    public static class Elevator {
+      public static int leftMotorCANID = 20;
+      public static int rightMotorCANID = 21;
+    }
+  }
 }

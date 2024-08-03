@@ -173,3 +173,13 @@ simgui*.json
 
 # Version file
 src/main/java/frc/robot/BuildConstants.java
+
+#ascope
+.glb
+.gltf
+ascopeassets/Robot_Inversion/
+ascopeassets/Robot_Inversion/model.glb
+ascopeassets/Robot_Inversion/model.glb
+ascopeassets/Robot_Inversion/model.gltf
+ascopeassets/Robot_Inversion/model.glb
+ascopeassets/Robot_Inversion/old/model_0.glb

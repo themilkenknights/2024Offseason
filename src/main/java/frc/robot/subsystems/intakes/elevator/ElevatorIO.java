@@ -6,10 +6,12 @@ public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
     public double leftAppliedVolts = 0.0;
-    public double[] leftCurrentAmps = new double[] {};
+    public double leftTorqueCurrentAmps = 0;
+    public double leftSupplyCurrentAmps = 0;
 
     public double rightAppliedVolts = 0.0;
-    public double[] rightCurrentAmps = new double[] {};
+    public double rightTorqueCurrentAmps = 0;
+    public double rightSupplyCurrentAmps = 0;
 
     public double encoderValue = 0;
   }
