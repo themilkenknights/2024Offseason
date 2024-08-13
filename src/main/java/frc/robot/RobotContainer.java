@@ -190,6 +190,8 @@ public class RobotContainer {
 
     controller.rightBumper().onTrue(intakes.goUp());
     controller.leftBumper().onTrue(intakes.goDown());
+
+    controller.b().onTrue(intakes.AutoHPin());
   }
 
   /**

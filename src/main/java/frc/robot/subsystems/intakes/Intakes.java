@@ -16,7 +16,7 @@ import frc.robot.subsystems.intakes.elevator.Elevator;
 import org.littletonrobotics.junction.Logger;
 
 public class Intakes extends SubsystemBase {
-  private Elevator intakeElevator = null;
+  private Elevator intakeElevator;
 
   public Intakes(IntakesIO io, Elevator elevator) {
     this.io = io;
@@ -57,10 +57,6 @@ public class Intakes extends SubsystemBase {
     // This method will be called once per scheduler run
     io.updateInputs(inputs);
     Logger.processInputs("Intakes", inputs);
-  }
-
-  public Command HPin() {
-    return new SequentialCommandGroup(setIntakesState(intakeStates.IN), TopIntakeByBeambreak());
   }
 
   public Command AutoHPin() {
@@ -113,5 +109,9 @@ public class Intakes extends SubsystemBase {
   public Command goDown() {
     return new ParallelCommandGroup(
         setIntakesState(intakeStates.OFF), intakeElevator.goToPosition(Elevator.Positions.GROUND));
+  }
+
+  public Command HPin() {
+    return new SequentialCommandGroup(setIntakesState(intakeStates.IN), TopIntakeByBeambreak());
   }
 }

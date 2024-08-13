@@ -3,12 +3,22 @@ package frc.robot.subsystems.intakes;
 import static frc.robot.Constants.IntakeElevator.Intakes;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import frc.robot.Constants.IntakeElevator.Intakes;
 import frc.robot.subsystems.intakes.Intakes.intakeStates;
+import java.util.HashMap;
 
 public class IntakesIOTalonFX implements IntakesIO {
   TalonFX topMotor = new TalonFX(Intakes.topIntakeCANID);
   TalonFX midMotor = new TalonFX(Intakes.midIntakeCANID);
   TalonFX bottomMotor = new TalonFX(Intakes.bottomIntakeCANID);
+
+  public IntakesIOTalonFX() {
+    motorStateMap.put(intakeStates.IN, IN);
+    motorStateMap.put(intakeStates.OUT, OUT);
+    motorStateMap.put(intakeStates.GROUND, GROUND);
+    motorStateMap.put(intakeStates.GROUNDOUT, GROUNDOUT);
+    motorStateMap.put(intakeStates.OFF, OFF);
+  }
 
   /** MotorStates */
   private class IntakeMotorStates {
@@ -27,11 +37,13 @@ public class IntakesIOTalonFX implements IntakesIO {
     }
   }
 
-  private final IntakeMotorStates IN = new IntakeMotorStates(12, 12, 0);
-  private final IntakeMotorStates OUT = new IntakeMotorStates(-12, -12, 0);
-  private final IntakeMotorStates GROUND = new IntakeMotorStates(0, 0, 0);
-  private final IntakeMotorStates GROUNDOUT = new IntakeMotorStates(12, -12, 0);
-  private final IntakeMotorStates OFF = new IntakeMotorStates(12, -12, 0);
+  private final IntakeMotorStates IN = new IntakeMotorStates(7.2, -7.2, 0);
+  private final IntakeMotorStates OUT = new IntakeMotorStates(-7.2, 7.2, 0);
+  private final IntakeMotorStates GROUND = new IntakeMotorStates(7.2, 7.2, 7.2);
+  private final IntakeMotorStates GROUNDOUT = new IntakeMotorStates(7.2, -7.2, -7.2);
+  private final IntakeMotorStates OFF = new IntakeMotorStates(0, 0, 0);
+
+  private final HashMap<intakeStates, IntakeMotorStates> motorStateMap = new HashMap<>();
 
   {
   }
@@ -42,21 +54,13 @@ public class IntakesIOTalonFX implements IntakesIO {
   }
 
   @Override
-  public void setMotorStates(intakeStates state) {
-    switch (state) {
-      case IN:
-
-      case OUT, GROUND, GROUNDOUT, OFF:
-        break;
-
-      default:
-        break;
-    }
+  public void setTopMotorStates(intakeStates state) {
+    throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
-  public void setTopMotorStates(intakeStates state) {
-    throw new UnsupportedOperationException("not implemented");
+  public void setMotorStates(intakeStates state) {
+    motorStateMap.get(state).apply();
   }
 
   @Override
@@ -64,4 +68,4 @@ public class IntakesIOTalonFX implements IntakesIO {
     // TODO Auto-generated method stub
     IntakesIO.super.updateInputs(inputs);
   }
- }
+}
