@@ -13,7 +13,11 @@
 
 package frc.robot;
 
+import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
+
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.auto.TriggerCommandUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,6 +25,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -33,7 +38,6 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intakes.Intakes;
-import frc.robot.subsystems.intakes.Intakes.intakeStates;
 import frc.robot.subsystems.intakes.IntakesIO;
 import frc.robot.subsystems.intakes.IntakesIOSim;
 import frc.robot.subsystems.intakes.elevator.Elevator;
@@ -62,6 +66,13 @@ public class RobotContainer {
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+
+  // triggers for named commands
+  private TriggerCommandUtil IntakeGroundTriggerCommand = new TriggerCommandUtil();
+  private TriggerCommandUtil AmpOutTriggerCommand = new TriggerCommandUtil();
+
+  private TriggerCommandUtil GoDownTriggerCommand = new TriggerCommandUtil();
+  private TriggerCommandUtil GoUpTriggerCommand = new TriggerCommandUtil();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -147,15 +158,37 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    new SequentialCommandGroup(
-            intakes.setIntakesState(intakeStates.IN).ignoringDisable(true),
-            Commands.waitSeconds(2),
-            intakes.setIntakesState(intakeStates.OUT).ignoringDisable(true),
-            Commands.waitSeconds(2),
-            intakes.setIntakesState(intakeStates.IN).ignoringDisable(true),
-            Commands.waitSeconds(2),
-            intakes.setIntakesState(intakeStates.OFF).ignoringDisable(true))
-        .schedule();
+    //   new SequentialCommandGroup(
+    //           intakes.setIntakesState(intakeStates.IN).ignoringDisable(true),
+    //           Commands.waitSeconds(2),
+    //           intakes.setIntakesState(intakeStates.OUT).ignoringDisable(true),
+    //           Commands.waitSeconds(2),
+    //           intakes.setIntakesState(intakeStates.IN).ignoringDisable(true),
+    //           Commands.waitSeconds(2),
+    //           intakes.setIntakesState(intakeStates.OFF).ignoringDisable(true))
+    //       .schedule();
+
+    RegisterPPCommands();
+  }
+
+  private void RegisterPPCommands() {
+
+   
+    //bind them to triggers
+    AmpOutTriggerCommand.getTrigger().onTrue(intakes.AutoAmpOuttake());
+    IntakeGroundTriggerCommand.getTrigger().onTrue(Commands.print("not implemented"));
+
+    GoDownTriggerCommand.getTrigger().onTrue(intakes.goDown());
+    GoUpTriggerCommand.getTrigger().onTrue(intakes.goUp());
+
+     //Add them to named commands
+     NamedCommands.registerCommand("AmpOut", AmpOutTriggerCommand);
+     NamedCommands.registerCommand("IntakeGround", IntakeGroundTriggerCommand);
+     NamedCommands.registerCommand("GoDown", GoDownTriggerCommand);
+     NamedCommands.registerCommand("GoUp", GoUpTriggerCommand);
+ 
+
+
   }
 
   /**
@@ -192,6 +225,11 @@ public class RobotContainer {
     controller.leftBumper().onTrue(intakes.goDown());
 
     controller.b().onTrue(intakes.AutoHPin());
+
+    SmartDashboard.putData(intakes.goDown());
+    SmartDashboard.putData(
+        new SequentialCommandGroup(
+            waitSeconds(2), intakes.AutoHPin(), waitSeconds(3), intakes.goDown()));
   }
 
   /**

@@ -36,6 +36,8 @@ public class IntakesIOSim implements IntakesIO {
 
   @Override
   public void updateInputs(IntakesIOInputs inputs) {
+    Logger.recordOutput("st", m_State);
+    Logger.recordOutput("timer", timeOfIntaking.get());
     if (timeOfIntaking.hasElapsed(ttNote) && m_State == noteState.INTAKING) {
       estimatedBeambreak = false;
       m_State = noteState.HAS;
@@ -66,6 +68,7 @@ public class IntakesIOSim implements IntakesIO {
           ttNote = 2;
           timeOfIntaking.restart();
           m_State = noteState.INTAKING;
+          estimatedBeambreak = true;
           break;
         case GROUNDOUT:
           ttNote = 2;
@@ -76,6 +79,7 @@ public class IntakesIOSim implements IntakesIO {
           ttNote = 1.75;
           timeOfIntaking.restart();
           m_State = noteState.INTAKING;
+          estimatedBeambreak = true;
           break;
         case OUT:
           ttNote = 1.75;

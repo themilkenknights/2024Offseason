@@ -30,11 +30,17 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.util.Alert;
+import frc.robot.util.Alert.AlertType;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -54,6 +60,9 @@ public class Drive extends SubsystemBase {
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
+  private final Field2d field2d = new Field2d();
+
+  private final Alert gyroAlert = new Alert("Drive", "Gyro Disconnected", AlertType.WARNING);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d rawGyroRotation = new Rotation2d();
@@ -121,6 +130,47 @@ public class Drive extends SubsystemBase {
                 },
                 null,
                 this));
+
+    SmartDashboard.putData(field2d);
+    SmartDashboard.putData(
+        "Swerve Drive",
+        new Sendable() {
+          @Override
+          public void initSendable(SendableBuilder builder) {
+            builder.setSmartDashboardType("SwerveDrive");
+
+            builder.addDoubleProperty(
+                "Front Left Angle", () -> modules[0].getAngle().getRadians(), null);
+            builder.addDoubleProperty(
+                "Front Left Velocity", () -> modules[0].getVelocityMetersPerSec(), null);
+
+            builder.addDoubleProperty(
+                "Front Right Angle", () -> modules[1].getAngle().getRadians(), null);
+            builder.addDoubleProperty(
+                "Front Right Velocity", () -> modules[1].getVelocityMetersPerSec(), null);
+
+            builder.addDoubleProperty(
+                "Back Left Angle", () -> modules[2].getAngle().getRadians(), null);
+            builder.addDoubleProperty(
+                "Back Left Velocity", () -> modules[2].getVelocityMetersPerSec(), null);
+
+            builder.addDoubleProperty(
+                "Back Right Angle", () -> modules[3].getAngle().getRadians(), null);
+            builder.addDoubleProperty(
+                "Back Right Velocity", () -> modules[3].getVelocityMetersPerSec(), null);
+
+            builder.addDoubleProperty("Robot Angle", () -> getRotation().getRadians(), null);
+          }
+        });
+    SmartDashboard.putData(
+        "Gyro",
+        new Sendable() {
+          @Override
+          public void initSendable(SendableBuilder builder) {
+            builder.setSmartDashboardType("Gyro");
+            builder.addDoubleProperty("Value", () -> getPose().getRotation().getDegrees(), null);
+          }
+        });
   }
 
   public void periodic() {
@@ -169,14 +219,19 @@ public class Drive extends SubsystemBase {
       if (gyroInputs.connected) {
         // Use the real gyro angle
         rawGyroRotation = gyroInputs.odometryYawPositions[i];
+        gyroAlert.set(false);
       } else {
         // Use the angle delta from the kinematics and module deltas
         Twist2d twist = kinematics.toTwist2d(moduleDeltas);
         rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
+
+        gyroAlert.set(true);
       }
 
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+
+      field2d.setRobotPose(getPose());
     }
   }
 

@@ -24,9 +24,9 @@ public class Intakes extends SubsystemBase {
     // if needed, switch Constants.currentMode
 
     // defaulting
-    final Command defaultCommandGroup = setIntakesState(intakeStates.OFF);
-    defaultCommandGroup.addRequirements(this);
-    setDefaultCommand(defaultCommandGroup);
+    // final Command defaultCommandGroup = setIntakesState(intakeStates.OFF);
+    // defaultCommandGroup.addRequirements(this);
+    // setDefaultCommand(defaultCommandGroup);
   }
 
   // private final double elevatorspeed = .6;
@@ -62,7 +62,7 @@ public class Intakes extends SubsystemBase {
   public Command AutoHPin() {
     return new SequentialCommandGroup(
         intakeElevator
-            .goToPosition(Elevator.Positions.GROUND)
+            .goToPosition(Elevator.Positions.HP)
             .until(() -> intakeElevator.getPositionError() < 10),
         setIntakesState(intakeStates.IN),
         TopIntakeByBeambreak());
