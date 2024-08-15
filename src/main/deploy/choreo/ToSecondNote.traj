@@ -528,11 +528,25 @@
   ],
   "eventMarkers": [
     {
-      "timestamp": 0.8764160710224781,
+      "timestamp": 0.5764160710224782,
       "command": {
-        "type": "named",
+        "type": "parallel",
         "data": {
-          "name": "RUNROLLERS"
+          "commands": [
+            {
+              "type": "sequential",
+              "data": {
+                "commands": [
+                  {
+                    "type": "named",
+                    "data": {
+                      "name": "RUNROLLERS"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
         }
       }
     }

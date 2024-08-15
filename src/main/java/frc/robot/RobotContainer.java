@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Autos.AutoBuildTool;
+import frc.robot.Autos.AutoBuildTool.dashboardSubsystem;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -38,6 +40,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intakes.Intakes;
+import frc.robot.subsystems.intakes.Intakes.intakeStates;
 import frc.robot.subsystems.intakes.IntakesIO;
 import frc.robot.subsystems.intakes.IntakesIOSim;
 import frc.robot.subsystems.intakes.elevator.Elevator;
@@ -54,6 +57,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  AutoBuildTool autoBuildTool;
   // Subsystems
   private final Drive drive;
   private final Intakes intakes;
@@ -67,6 +71,7 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
+  private AutoBuildTool.dashboardSubsystem dashboardSubsystem;
   // triggers for named commands
   private TriggerCommandUtil IntakeGroundTriggerCommand = new TriggerCommandUtil();
   private TriggerCommandUtil AmpOutTriggerCommand = new TriggerCommandUtil();
@@ -127,8 +132,10 @@ public class RobotContainer {
         break;
     }
 
+    RegisterPPCommands();
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
     // Set up SysId routines
     // autoChooser.addOption(
     // "Drive SysId (Quasistatic Forward)",
@@ -168,27 +175,27 @@ public class RobotContainer {
     //           intakes.setIntakesState(intakeStates.OFF).ignoringDisable(true))
     //       .schedule();
 
-    RegisterPPCommands();
   }
 
   private void RegisterPPCommands() {
 
-   
-    //bind them to triggers
+    // bind them to triggers
     AmpOutTriggerCommand.getTrigger().onTrue(intakes.AutoAmpOuttake());
     IntakeGroundTriggerCommand.getTrigger().onTrue(Commands.print("not implemented"));
 
     GoDownTriggerCommand.getTrigger().onTrue(intakes.goDown());
     GoUpTriggerCommand.getTrigger().onTrue(intakes.goUp());
 
-     //Add them to named commands
-     NamedCommands.registerCommand("AmpOut", AmpOutTriggerCommand);
-     NamedCommands.registerCommand("IntakeGround", IntakeGroundTriggerCommand);
-     NamedCommands.registerCommand("GoDown", GoDownTriggerCommand);
-     NamedCommands.registerCommand("GoUp", GoUpTriggerCommand);
- 
+    // Add them to named commands
+    NamedCommands.registerCommand("AmpOut", intakes.AutoAmpOuttake());
+    NamedCommands.registerCommand("IntakeGround", intakes.AutoGroundIntake());
+    NamedCommands.registerCommand("GoDown", intakes.goDown());
+    NamedCommands.registerCommand("GoUp", intakes.goUp());
+    NamedCommands.registerCommand(
+        "RUNROLLERS", intakes.setIntakesState(intakeStates.GROUND).asProxy().withTimeout(0.02));
 
-
+    autoBuildTool = new AutoBuildTool();
+    dashboardSubsystem = autoBuildTool.new dashboardSubsystem();
   }
 
   /**
@@ -238,6 +245,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    // AutoBuildTool tool = new AutoBuildTool(intakes.AutoAmpOuttake(), intakes.AutoGroundIntake());
+    return autoBuildTool.getAutoCommand(); // .tool.getAutoCommand();
   }
 }

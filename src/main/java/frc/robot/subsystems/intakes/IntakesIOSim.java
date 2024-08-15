@@ -20,7 +20,7 @@ public class IntakesIOSim implements IntakesIO {
 
   intakeStates lastState = intakeStates.OFF;
 
-  noteState m_State = noteState.NONE;
+  noteState m_State = noteState.HAS;
   boolean estimatedBeambreak = true;
   Timer timeOfIntaking = new Timer();
   double ttNote = 0;
@@ -65,24 +65,24 @@ public class IntakesIOSim implements IntakesIO {
     if (state != lastState) {
       switch (state) {
         case GROUND:
-          ttNote = 2;
+          ttNote = 1;
           timeOfIntaking.restart();
           m_State = noteState.INTAKING;
           estimatedBeambreak = true;
           break;
         case GROUNDOUT:
-          ttNote = 2;
+          ttNote = 1;
           timeOfIntaking.restart();
           m_State = noteState.OUTTAKING;
           break;
         case IN:
-          ttNote = 1.75;
+          ttNote = 0.75;
           timeOfIntaking.restart();
           m_State = noteState.INTAKING;
           estimatedBeambreak = true;
           break;
         case OUT:
-          ttNote = 1.75;
+          ttNote = 0.75;
           timeOfIntaking.restart();
           m_State = noteState.OUTTAKING;
           break;

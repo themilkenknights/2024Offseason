@@ -1,0 +1,31 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.6941043138504028,
+      "y": 7.16963005065918
+    },
+    "rotation": -6.608867796343277e-16
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FirstNote"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AmpOut"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": true
+}

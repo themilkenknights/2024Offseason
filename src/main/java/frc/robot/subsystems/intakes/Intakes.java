@@ -114,4 +114,12 @@ public class Intakes extends SubsystemBase {
   public Command HPin() {
     return new SequentialCommandGroup(setIntakesState(intakeStates.IN), TopIntakeByBeambreak());
   }
+
+  public Command AutoGroundIntake() {
+    return new SequentialCommandGroup(
+        intakeElevator
+            .goToPosition(Elevator.Positions.GROUND)
+            .until(() -> intakeElevator.getPositionError() < 10),
+        setIntakesState(intakeStates.GROUND));
+  }
 }

@@ -1,101 +1,103 @@
 package frc.robot.Autos;
 
+// import edu.wpi.first.wpilibj2.command.button.Trigger;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.auto.CommandUtil;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.Alert;
+import frc.robot.util.Alert.AlertType;
+import java.util.HashMap;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
 public class AutoBuildTool {
+  public class dashboardSubsystem extends SubsystemBase {
+    Alert emptyAuto = new Alert("Auto", "Auto Is Empty!!!", AlertType.WARNING);
+    Alert autoToLong = new Alert("Auto", "Auto may be greater then 15 seconds", AlertType.ERROR);
+    double estimatedAutoLength = 0;
 
-  public static class Triggers {
-    // public Trigger SetRollersIn(){
-    // return new Trigger(null);
-    // }
-
-    public Trigger SetRollersOut() {
-      return new Trigger(() -> rollersOut);
-    }
-
-    public Trigger SetRollersGround() {
-      return new Trigger(() -> rollersIn);
-    }
-
-    public Trigger SetElevatorHP() {
-      return new Trigger(() -> elevatorUp);
-    }
-
-    public Trigger SetElevatorDown() {
-      return new Trigger(() -> !elevatorUp);
-    }
-
-    public Command GoDown(){
-        return NamedCommands.getCommand("GoDown");
-    }
-  }
-
-  private static boolean rollersIn = false;
-  private static boolean rollersOut = false;
-  private static boolean elevatorUp = false;
-
-  public static class AutonomousSequence {
-
-    public AutonomousSequence(
-        AutoClass autoClass,
-        CenterLineChoice centerLineChoice,
-        double preDelay,
-        double preCenterLineDelay) {
-      this.autoClass = autoClass;
-      this.centerLineChoice = centerLineChoice;
-      this.preDelay = preDelay;
-      this.preCenterLineDelay = preCenterLineDelay;
-    }
-
-    AutoClass autoClass;
-    CenterLineChoice centerLineChoice;
-    double preDelay;
-    double preCenterLineDelay;
-    private Command autoCommand;
-
-    private void build() {
-      PathPlannerPath mainPath = PathPlannerPath.fromChoreoTrajectory("FirstNote");
-      Command mainPathCommand = AutoBuilder.followPath(mainPath);
-      PathPlannerPath secondPath;
-
-      // create a SequentialCommandGroup with the delay and the main path;
-      if (preDelay > 0) {
-        autoCommand = new SequentialCommandGroup(GoDown(),waitSeconds(preDelay));
+    @Override
+    public void periodic() {
+      if (autoClassChooser.get() == AutoClass.NONE
+          & centerLineChooser.get() == CenterLineChoice.NONE) {
+        emptyAuto.set(true);
       } else {
-        autoCommand = new SequentialCommandGroup(); // (GoDown());
+        emptyAuto.set(false);
+      }
+      estimatedAutoLength = preDelayInput.get() + preLeave.get();
+      if (autoClassChooser.get() == AutoClass.DOUBLE) {
+        estimatedAutoLength += 4;
+      }
+      if (autoClassChooser.get() == AutoClass.SINGLE) {
+        estimatedAutoLength += 3;
+      }
+      if (centerLineChooser.get() != CenterLineChoice.NONE) {
+        estimatedAutoLength += 3;
       }
 
-      // add main path
-      if (autoClass != AutoClass.NONE) {
-        autoCommand = new SequentialCommandGroup(mainPathCommand);
-      }
-
-      // add the post delay
-      if (preCenterLineDelay > 0) {
-        autoCommand = autoCommand.andThen(waitSeconds(preCenterLineDelay));
-      }
-      // add the center line path
-      if (centerLineChoice != CenterLineChoice.NONE) {
-        secondPath = PathPlannerPath.fromChoreoTrajectory(centerLineChoice.toString());
-        autoCommand = autoCommand.andThen(AutoBuilder.followPath(secondPath));
+      if (estimatedAutoLength >= 15) {
+        autoToLong.set(true);
+      } else {
+        autoToLong.set(false);
       }
     }
-
-    public Command getCommand() {
-      if (autoCommand == null) {
-        build();
-      }
-      return autoCommand;
-    }
-    ;
   }
+
+  LoggedDashboardChooser<AutoClass> autoClassChooser =
+      new LoggedDashboardChooser<>("Auto Class Choice");
+
+  LoggedDashboardNumber preDelayInput = new LoggedDashboardNumber("pre auto delay", 0);
+
+  LoggedDashboardChooser<CenterLineChoice> centerLineChooser =
+      new LoggedDashboardChooser<>("Center Line Choice");
+
+  LoggedDashboardNumber preLeave = new LoggedDashboardNumber("delay after notes Seconds", 0);
+  Alert AutoReminder = new Alert("Auto", "Remember to select an Auto", AlertType.INFO);
+
+  public AutoBuildTool() {
+    AutoReminder.set(true);
+    autoClassChooser.addDefaultOption("Single", AutoClass.SINGLE);
+    autoClassChooser.addOption("Double", AutoClass.DOUBLE);
+    autoClassChooser.addOption("None", AutoClass.NONE);
+
+    centerLineChooser.addDefaultOption("Centerline note", CenterLineChoice.CENTERLINE_NOTE);
+    centerLineChooser.addOption("centerline", CenterLineChoice.CENTERLINE);
+    centerLineChooser.addOption("leave wing", CenterLineChoice.CENTERLINE_POST_WING);
+    centerLineChooser.addOption("stay in wing", CenterLineChoice.WING);
+    centerLineChooser.addOption("stay at amp", CenterLineChoice.NONE);
+    // TODO: add backup option
+
+    AutoClassCommands.put(AutoClass.SINGLE, AutoBuilder.buildAuto("SINGLE"));
+    AutoClassCommands.put(AutoClass.DOUBLE, AutoBuilder.buildAuto("DOUBLE"));
+    AutoClassCommands.put(AutoClass.NONE, Commands.none());
+  }
+
+  public Command getAutoCommand() {
+    Command autoCommand;
+
+    autoCommand =
+        new SequentialCommandGroup(
+            waitSeconds(preDelayInput.get()),
+            CommandUtil.wrappedEventCommand(AutoClassCommands.get(autoClassChooser.get())),
+            waitSeconds(preLeave.get()));
+
+    if (centerLineChooser.get() != CenterLineChoice.NONE) {
+      autoCommand =
+          autoCommand.andThen(
+              AutoBuilder.followPath(
+                  PathPlannerPath.fromChoreoTrajectory(centerLineChooser.get().toString())));
+    }
+
+    return autoCommand;
+  }
+
+  HashMap<AutoClass, Command> AutoClassCommands = new HashMap<>();
 
   static enum AutoClass {
     /** Place a preloaded note */

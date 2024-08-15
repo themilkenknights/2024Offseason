@@ -456,7 +456,28 @@
             "defaultControlIntervalCount": 40,
             "usesDefaultFieldObstacles": true,
             "circleObstacles": [],
-            "eventMarkers": [],
+            "eventMarkers": [
+                {
+                    "name": "Marker",
+                    "target": 0,
+                    "trajTargetIndex": 0,
+                    "targetTimestamp": 0,
+                    "offset": 0.3,
+                    "command": {
+                        "type": "parallel",
+                        "data": {
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "GoUp"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
             "isTrajectoryStale": false
         },
         "CENTERLINE": {
@@ -3988,11 +4009,25 @@
                     "target": 2,
                     "trajTargetIndex": 2,
                     "targetTimestamp": 0.8764160710224781,
-                    "offset": 0,
+                    "offset": -0.3,
                     "command": {
-                        "type": "named",
+                        "type": "parallel",
                         "data": {
-                            "name": "RUNROLLERS"
+                            "commands": [
+                                {
+                                    "type": "sequential",
+                                    "data": {
+                                        "commands": [
+                                            {
+                                                "type": "named",
+                                                "data": {
+                                                    "name": "RUNROLLERS"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -4421,7 +4456,28 @@
             "defaultControlIntervalCount": 40,
             "usesDefaultFieldObstacles": true,
             "circleObstacles": [],
-            "eventMarkers": [],
+            "eventMarkers": [
+                {
+                    "name": "Marker",
+                    "target": 0,
+                    "trajTargetIndex": 0,
+                    "targetTimestamp": 0,
+                    "offset": 0.3,
+                    "command": {
+                        "type": "parallel",
+                        "data": {
+                            "commands": [
+                                {
+                                    "type": "named",
+                                    "data": {
+                                        "name": "GoUp"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
             "isTrajectoryStale": false
         },
         "WING": {
