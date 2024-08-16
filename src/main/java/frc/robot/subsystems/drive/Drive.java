@@ -13,7 +13,8 @@
 
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.DashboardTelem.field2d;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
@@ -34,7 +35,6 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -60,9 +60,8 @@ public class Drive extends SubsystemBase {
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
-  private final Field2d field2d = new Field2d();
 
-  private final Alert gyroAlert = new Alert("Drive", "Gyro Disconnected", AlertType.WARNING);
+  private final Alert gyroAlert = new Alert("Gyro Disconnected", AlertType.WARNING);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d rawGyroRotation = new Rotation2d();
@@ -99,8 +98,8 @@ public class Drive extends SubsystemBase {
         this::runVelocity,
         new HolonomicPathFollowerConfig(
             MAX_LINEAR_SPEED, DRIVE_BASE_RADIUS, new ReplanningConfig()),
-        () ->
-            DriverStation.getAlliance().isPresent()
+        () -> // flip supplier
+        DriverStation.getAlliance().isPresent()
                 && DriverStation.getAlliance().get() == Alliance.Red,
         this);
     Pathfinding.setPathfinder(new LocalADStarAK());
@@ -108,6 +107,9 @@ public class Drive extends SubsystemBase {
         (activePath) -> {
           Logger.recordOutput(
               "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+          field2d
+              .getObject("active_traj")
+              .setPoses(activePath.toArray(new Pose2d[activePath.size()]));
         });
     PathPlannerLogging.setLogTargetPoseCallback(
         (targetPose) -> {

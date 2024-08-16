@@ -43,6 +43,7 @@
     "GROUNDOUT",
     "Intaking",
     "OUTTAKING",
-    "Robo"
+    "Robo",
+    "Traj"
   ]
 }

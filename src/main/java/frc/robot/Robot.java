@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -101,6 +102,13 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
   }
 
+  @Override
+  public void autonomousExit() {
+    // TODO Auto-generated method stub
+    super.autonomousExit();
+    Shuffleboard.selectTab("Main Match");
+  }
+
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {}
@@ -127,6 +135,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    Shuffleboard.selectTab("Main Match");
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove

@@ -15,9 +15,8 @@ package frc.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
-import com.pathplanner.lib.auto.AutoBuilder;
+
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.auto.TriggerCommandUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,7 +30,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Autos.AutoBuildTool;
-import frc.robot.Autos.AutoBuildTool.dashboardSubsystem;
+
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -48,7 +47,7 @@ import frc.robot.subsystems.intakes.elevator.ElevatorIO;
 import frc.robot.subsystems.intakes.elevator.ElevatorIOSim;
 import frc.robot.util.NoteVisuals;
 import frc.robot.util.NoteVisuals.VisualNote;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -69,15 +68,10 @@ public class RobotContainer {
   private final CommandXboxController controller = new CommandXboxController(0);
 
   // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+
 
   private AutoBuildTool.dashboardSubsystem dashboardSubsystem;
-  // triggers for named commands
-  private TriggerCommandUtil IntakeGroundTriggerCommand = new TriggerCommandUtil();
-  private TriggerCommandUtil AmpOutTriggerCommand = new TriggerCommandUtil();
 
-  private TriggerCommandUtil GoDownTriggerCommand = new TriggerCommandUtil();
-  private TriggerCommandUtil GoUpTriggerCommand = new TriggerCommandUtil();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -134,7 +128,7 @@ public class RobotContainer {
 
     RegisterPPCommands();
     // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
 
     // Set up SysId routines
     // autoChooser.addOption(
@@ -179,12 +173,7 @@ public class RobotContainer {
 
   private void RegisterPPCommands() {
 
-    // bind them to triggers
-    AmpOutTriggerCommand.getTrigger().onTrue(intakes.AutoAmpOuttake());
-    IntakeGroundTriggerCommand.getTrigger().onTrue(Commands.print("not implemented"));
 
-    GoDownTriggerCommand.getTrigger().onTrue(intakes.goDown());
-    GoUpTriggerCommand.getTrigger().onTrue(intakes.goUp());
 
     // Add them to named commands
     NamedCommands.registerCommand("AmpOut", intakes.AutoAmpOuttake());
@@ -196,6 +185,7 @@ public class RobotContainer {
 
     autoBuildTool = new AutoBuildTool();
     dashboardSubsystem = autoBuildTool.new dashboardSubsystem();
+    dashboardSubsystem.getName();
   }
 
   /**
