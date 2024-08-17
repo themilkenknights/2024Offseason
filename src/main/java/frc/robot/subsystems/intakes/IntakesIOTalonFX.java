@@ -1,7 +1,5 @@
 package frc.robot.subsystems.intakes;
 
-import static frc.robot.Constants.IntakeElevator.Intakes;
-
 import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.Constants.IntakeElevator.Intakes;
 import frc.robot.subsystems.intakes.Intakes.intakeStates;
@@ -65,7 +63,16 @@ public class IntakesIOTalonFX implements IntakesIO {
 
   @Override
   public void updateInputs(IntakesIOInputs inputs) {
-    // TODO Auto-generated method stub
-    IntakesIO.super.updateInputs(inputs);
+    inputs.groundAppliedVolts = bottomMotor.getMotorVoltage().getValue();
+    inputs.groundSupplyCurrentAmps = bottomMotor.getSupplyCurrent().getValue();
+    inputs.groundTorqueCurrentAmps = bottomMotor.getTorqueCurrent().getValue();
+
+    inputs.midAppliedVolts = midMotor.getMotorVoltage().getValue();
+    inputs.midSupplyCurrentAmps = midMotor.getSupplyCurrent().getValue();
+    inputs.midTorqueCurrentAmps = midMotor.getTorqueCurrent().getValue();
+
+    inputs.topAppliedVolts = topMotor.getMotorVoltage().getValue();
+    inputs.topSupplyCurrentAmps = topMotor.getSupplyCurrent().getValue();
+    inputs.topTorqueCurrentAmps = topMotor.getTorqueCurrent().getValue();
   }
 }

@@ -47,4 +47,27 @@ public final class Constants {
       public static int rightMotorCANID = 21;
     }
   }
+
+  public static class Climb {
+    public static final int ClimbCANID = 24;
+    public static final int ClimbServoPORT = 0;
+
+    public static class setpoints {
+      public static double upSetpoint = 70;
+      public static double downSetpoint = -1;
+
+      public static double servoLockedSetpoint = 0.6;
+      public static double servoOpenSetpoint = 0.3;
+      public static final double servoDelay = 0.2;
+    }
+
+    public static class gains {
+      public static double GainUpP = 0.9;
+      public static double GainDownP = 2.25;
+      public static double gainI = 0;
+      public static double gainD = 0.1;
+
+      public static double tolerance = 3;
+    }
+  }
 }

@@ -104,8 +104,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousExit() {
-    // TODO Auto-generated method stub
-    super.autonomousExit();
     Shuffleboard.selectTab("Main Match");
   }
 

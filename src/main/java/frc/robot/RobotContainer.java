@@ -15,7 +15,6 @@ package frc.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
-
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -30,8 +29,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Autos.AutoBuildTool;
-
 import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.climb.ClimbIO;
+import frc.robot.subsystems.climb.ClimbIOSim;
+import frc.robot.subsystems.climb.ClimbIOTalonFX;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -42,12 +44,13 @@ import frc.robot.subsystems.intakes.Intakes;
 import frc.robot.subsystems.intakes.Intakes.intakeStates;
 import frc.robot.subsystems.intakes.IntakesIO;
 import frc.robot.subsystems.intakes.IntakesIOSim;
+import frc.robot.subsystems.intakes.IntakesIOTalonFX;
 import frc.robot.subsystems.intakes.elevator.Elevator;
 import frc.robot.subsystems.intakes.elevator.ElevatorIO;
 import frc.robot.subsystems.intakes.elevator.ElevatorIOSim;
+import frc.robot.subsystems.intakes.elevator.ElevatorIOTalonFX;
 import frc.robot.util.NoteVisuals;
 import frc.robot.util.NoteVisuals.VisualNote;
-
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -61,6 +64,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Intakes intakes;
   private final Elevator elevator;
+  private final Climb climb;
 
   // notes
   NoteVisuals noteVisuals = new NoteVisuals();
@@ -69,9 +73,7 @@ public class RobotContainer {
 
   // Dashboard inputs
 
-
   private AutoBuildTool.dashboardSubsystem dashboardSubsystem;
-
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -95,8 +97,9 @@ public class RobotContainer {
                 new ModuleIOTalonFX(2),
                 new ModuleIOTalonFX(3));
         // flywheel = new Flywheel(new FlywheelIOTalonFX());
-        elevator = new Elevator(new ElevatorIO() {});
-        intakes = new Intakes(new IntakesIO() {}, elevator);
+        elevator = new Elevator(new ElevatorIOTalonFX() {});
+        intakes = new Intakes(new IntakesIOTalonFX() {}, elevator);
+        climb = new Climb(new ClimbIOTalonFX());
         break;
 
       case SIM:
@@ -110,6 +113,7 @@ public class RobotContainer {
                 new ModuleIOSim());
         elevator = new Elevator(new ElevatorIOSim());
         intakes = new Intakes(new IntakesIOSim(drive::getPose), elevator);
+        climb = new Climb(new ClimbIOSim());
         break;
 
       default:
@@ -123,12 +127,12 @@ public class RobotContainer {
                 new ModuleIO() {});
         elevator = new Elevator(new ElevatorIO() {});
         intakes = new Intakes(new IntakesIO() {}, elevator);
+        climb = new Climb(new ClimbIO() {});
         break;
     }
 
     RegisterPPCommands();
     // Set up auto routines
-
 
     // Set up SysId routines
     // autoChooser.addOption(
@@ -158,22 +162,9 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
-
-    //   new SequentialCommandGroup(
-    //           intakes.setIntakesState(intakeStates.IN).ignoringDisable(true),
-    //           Commands.waitSeconds(2),
-    //           intakes.setIntakesState(intakeStates.OUT).ignoringDisable(true),
-    //           Commands.waitSeconds(2),
-    //           intakes.setIntakesState(intakeStates.IN).ignoringDisable(true),
-    //           Commands.waitSeconds(2),
-    //           intakes.setIntakesState(intakeStates.OFF).ignoringDisable(true))
-    //       .schedule();
-
   }
 
   private void RegisterPPCommands() {
-
-
 
     // Add them to named commands
     NamedCommands.registerCommand("AmpOut", intakes.AutoAmpOuttake());
@@ -195,6 +186,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    // drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
@@ -218,10 +210,14 @@ public class RobotContainer {
         .povLeft()
         .whileTrue(drive.run(() -> drive.runVelocity(new ChassisSpeeds(-0.5, 0, 0))));
 
-    controller.rightBumper().onTrue(intakes.goUp());
-    controller.leftBumper().onTrue(intakes.goDown());
+    // climb
+    controller.povUp().onTrue(climb.deploy());
+    controller.povDown().onTrue(climb.climb());
 
-    controller.b().onTrue(intakes.AutoHPin());
+    // controller.rightBumper().onTrue(intakes.goUp());
+    // controller.leftBumper().onTrue(intakes.goDown());
+
+    // controller.b().onTrue(intakes.AutoHPin());
 
     SmartDashboard.putData(intakes.goDown());
     SmartDashboard.putData(
@@ -235,7 +231,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // AutoBuildTool tool = new AutoBuildTool(intakes.AutoAmpOuttake(), intakes.AutoGroundIntake());
+    // AutoBuildTool tool = new AutoBuildTool(intakes.AutoAmpOuttake(),
+    // intakes.AutoGroundIntake());
     return autoBuildTool.getAutoCommand(); // .tool.getAutoCommand();
   }
 }
