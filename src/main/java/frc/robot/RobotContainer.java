@@ -21,6 +21,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -28,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Autos.AutoBuildTool;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveCommands.HPChoices;
+import frc.robot.subsystems.LEDS;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbIO;
 import frc.robot.subsystems.climb.ClimbIOSim;
@@ -63,7 +65,7 @@ public class RobotContainer {
   private final Intakes intakes;
   private final Elevator elevator;
   private final Climb climb;
-
+  private final LEDS leds;
   // notes
   NoteVisuals noteVisuals = new NoteVisuals();
   // Controller
@@ -128,6 +130,11 @@ public class RobotContainer {
         climb = new Climb(new ClimbIO() {});
         break;
     }
+
+    // create led subsystem after creating all the others
+
+    leds = new LEDS(intakes::getBeambreak);
+    SmartDashboard.putData(leds);
 
     RegisterPPCommands();
     // Set up auto routines
@@ -248,6 +255,9 @@ public class RobotContainer {
                     intakes.AutoHPin(),
                     intakes.setDown())
                 .andThen(DriveCommands.driveToAmp()));
+    // leds
+    controller.rightBumper().whileTrue(leds.FlashOrange());
+    controller.leftBumper().whileTrue(leds.FlashBlue());
     // controller.rightBumper().onTrue(intakes.goUp());
     // controller.leftBumper().onTrue(intakes.goDown());
 

@@ -2,7 +2,7 @@ package frc.robot.Autos;
 
 // import edu.wpi.first.wpilibj2.command.button.Trigger;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
-import static frc.robot.DashboardTelem.field2d;
+import static frc.robot.Telem.field2d;
 
 import com.choreo.lib.Choreo;
 import com.pathplanner.lib.auto.AutoBuilder;

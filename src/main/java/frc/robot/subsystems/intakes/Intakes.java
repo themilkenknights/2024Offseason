@@ -43,6 +43,10 @@ public class Intakes extends SubsystemBase {
     OFF
   }
 
+  public boolean getBeambreak() {
+    return inputs.beambreak;
+  }
+
   public Command setIntakesState(intakeStates state) {
     return new InstantCommand(
         () -> {

@@ -45,6 +45,7 @@ public class IntakesIOSim implements IntakesIO {
       estimatedBeambreak = true;
       m_State = noteState.NONE;
     }
+    estimatedBeambreak = (m_State != noteState.NONE) ? false : true;
     inputs.beambreak = estimatedBeambreak;
     if (!estimatedBeambreak) {
       if (note == null) {

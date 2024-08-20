@@ -50,6 +50,8 @@ public final class Constants {
       public static int leftMotorCANID = 20;
       public static int rightMotorCANID = 21;
     }
+
+    public static int ledPORT = 2;
   }
 
   public static class Climb {

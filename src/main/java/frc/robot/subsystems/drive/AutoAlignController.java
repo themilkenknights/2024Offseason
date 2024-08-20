@@ -26,7 +26,7 @@ public class AutoAlignController {
             theta.calculate(
                 measurement.getRotation().getDegrees(), target.getRotation().getDegrees()));
 
-    return new ChassisSpeeds(xSpeed, ySpeed, 0);
+    return new ChassisSpeeds(xSpeed, ySpeed, omega);
   }
 
   void setSetpoint(Pose2d setPoint) {
