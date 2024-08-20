@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.intakes.elevator.Elevator;
+import frc.robot.subsystems.intakes.elevator.Elevator.Positions;
 import org.littletonrobotics.junction.Logger;
 
 public class Intakes extends SubsystemBase {
@@ -65,7 +66,11 @@ public class Intakes extends SubsystemBase {
             .goToPosition(Elevator.Positions.HP)
             .until(() -> intakeElevator.getPositionError() < 10),
         setIntakesState(intakeStates.IN),
-        TopIntakeByBeambreak());
+        TopIntakeByBeambreak(),
+        runOnce(
+            () -> {
+              intakeElevator.setGoal(Positions.GROUND);
+            }));
   }
 
   public Command TopIntakeByBeambreak() {
@@ -109,6 +114,10 @@ public class Intakes extends SubsystemBase {
   public Command goDown() {
     return new ParallelCommandGroup(
         setIntakesState(intakeStates.OFF), intakeElevator.goToPosition(Elevator.Positions.GROUND));
+  }
+
+  public Command setDown() {
+    return intakeElevator.setGoal(Positions.GROUND);
   }
 
   public Command HPin() {

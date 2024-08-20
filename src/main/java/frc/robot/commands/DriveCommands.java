@@ -13,6 +13,9 @@
 
 package frc.robot.commands;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,6 +26,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.drive.AutoAlignController;
 import frc.robot.subsystems.drive.Drive;
 import java.util.function.DoubleSupplier;
 
@@ -30,6 +34,15 @@ public class DriveCommands {
   private static final double DEADBAND = 0.1;
 
   private DriveCommands() {}
+
+  public static Command autoDriveCommandTest(Drive drive, Pose2d target) {
+    AutoAlignController controller = new AutoAlignController(target);
+    return Commands.run(
+        () -> {
+          drive.runVelocity(controller.calculate(drive.getPose()));
+        },
+        drive);
+  }
 
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
@@ -53,7 +66,7 @@ public class DriveCommands {
           linearMagnitude = linearMagnitude * linearMagnitude;
           omega = Math.copySign(omega * omega, omega);
 
-          // Calcaulate new linear velocity
+          // Calculate new linear velocity
           Translation2d linearVelocity =
               new Pose2d(new Translation2d(), linearDirection)
                   .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
@@ -73,5 +86,37 @@ public class DriveCommands {
                       : drive.getRotation()));
         },
         drive);
+  }
+
+  public static Command driveToAmp() {
+    PathPlannerPath path = PathPlannerPath.fromPathFile("Amp aligner");
+    // if (Constants.isFlipped.getAsBoolean()) {
+    // path.flipPath();
+    // }
+    AutoBuilder.buildAuto("DOUBLE");
+    return AutoBuilder.pathfindThenFollowPath(path, new PathConstraints(3.7, 3.5, 540, 720));
+  }
+
+  public static enum HPChoices {
+    HP_LEFT,
+    HP_RIGHT,
+    HP_MID
+  }
+
+  private static HPChoices lastChoice = HPChoices.HP_RIGHT;
+
+  public static Command driveToHP(HPChoices hp) {
+    lastChoice = hp;
+    // PathPlannerPath path = PathPlannerPath.fromPathFile(hp.toString());
+    return AutoBuilder.pathfindThenFollowPath(
+        PathPlannerPath.fromPathFile(hp.toString()), new PathConstraints(3.7, 3.5, 540, 720));
+  }
+
+  public static Command driveToHP() {
+
+    // PathPlannerPath path = PathPlannerPath.fromPathFile(hp.toString());
+    return AutoBuilder.pathfindThenFollowPath(
+        PathPlannerPath.fromPathFile(lastChoice.toString()),
+        new PathConstraints(3.7, 3.5, 540, 720));
   }
 }

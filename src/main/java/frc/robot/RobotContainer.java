@@ -13,8 +13,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
-
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -23,13 +21,13 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Autos.AutoBuildTool;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.DriveCommands.HPChoices;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbIO;
 import frc.robot.subsystems.climb.ClimbIOSim;
@@ -214,15 +212,47 @@ public class RobotContainer {
     controller.povUp().onTrue(climb.deploy());
     controller.povDown().onTrue(climb.climb());
 
+    controller
+        .leftBumper()
+        .whileTrue(DriveCommands.autoDriveCommandTest(drive, new Pose2d(0, 0, new Rotation2d(0))));
+
+    controller
+        .a()
+        .whileTrue(
+            new SequentialCommandGroup(DriveCommands.driveToAmp(), intakes.AutoAmpOuttake())
+                .andThen(DriveCommands.driveToHP()));
+
+    controller
+        .leftTrigger()
+        .whileTrue(
+            new SequentialCommandGroup(
+                    DriveCommands.driveToHP(HPChoices.HP_LEFT),
+                    intakes.AutoHPin(),
+                    intakes.setDown())
+                .andThen(DriveCommands.driveToAmp()));
+    controller
+        .rightTrigger()
+        .whileTrue(
+            new SequentialCommandGroup(
+                    DriveCommands.driveToHP(HPChoices.HP_RIGHT),
+                    intakes.AutoHPin(),
+                    intakes.setDown())
+                .andThen(DriveCommands.driveToAmp()));
+
+    controller
+        .rightTrigger()
+        .and(controller.leftTrigger())
+        .whileTrue(
+            new SequentialCommandGroup(
+                    DriveCommands.driveToHP(HPChoices.HP_MID),
+                    intakes.AutoHPin(),
+                    intakes.setDown())
+                .andThen(DriveCommands.driveToAmp()));
     // controller.rightBumper().onTrue(intakes.goUp());
     // controller.leftBumper().onTrue(intakes.goDown());
 
     // controller.b().onTrue(intakes.AutoHPin());
 
-    SmartDashboard.putData(intakes.goDown());
-    SmartDashboard.putData(
-        new SequentialCommandGroup(
-            waitSeconds(2), intakes.AutoHPin(), waitSeconds(3), intakes.goDown()));
   }
 
   /**
