@@ -21,6 +21,7 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,6 +31,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -329,6 +332,24 @@ public class Drive extends SubsystemBase {
    */
   public void addVisionMeasurement(Pose2d visionPose, double timestamp) {
     poseEstimator.addVisionMeasurement(visionPose, timestamp);
+  }
+
+  public void acceptVisionMeasurement(Pose2d visionPose, double timestamp) {
+    if (visionPose != null
+        && Math.abs(Units.radiansToDegrees(gyroInputs.yawVelocityRadPerSec)) <= 720) { // if our
+      // angular
+      // velocity is
+      // greater than 720 degrees per
+      // second, ignore vision updates
+      poseEstimator.addVisionMeasurement(visionPose, timestamp);
+    }
+  }
+
+  public void acceptVisionMeasurement(
+      Pose2d visionPose, double timestamp, Matrix<N3, N1> VisionMeasurementStdDevs) {
+
+    poseEstimator.setVisionMeasurementStdDevs(VisionMeasurementStdDevs);
+    acceptVisionMeasurement(visionPose, timestamp);
   }
 
   /** Returns the maximum linear speed in meters per sec. */

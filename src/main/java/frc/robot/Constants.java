@@ -79,4 +79,5 @@ public final class Constants {
 
   public static final BooleanSupplier isFlipped = () -> // flip supplier
       DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red;
+  public static final String LimelightName = "limelight-knights";
 }

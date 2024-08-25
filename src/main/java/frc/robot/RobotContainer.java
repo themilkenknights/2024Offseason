@@ -49,6 +49,10 @@ import frc.robot.subsystems.intakes.elevator.Elevator;
 import frc.robot.subsystems.intakes.elevator.ElevatorIO;
 import frc.robot.subsystems.intakes.elevator.ElevatorIOSim;
 import frc.robot.subsystems.intakes.elevator.ElevatorIOTalonFX;
+import frc.robot.subsystems.vision.Limelight;
+import frc.robot.subsystems.vision.LimelightIO;
+import frc.robot.subsystems.vision.LimelightIOSim;
+import frc.robot.subsystems.vision.LimelightIO_MT2;
 import frc.robot.util.NoteVisuals;
 import frc.robot.util.NoteVisuals.VisualNote;
 
@@ -66,6 +70,7 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Climb climb;
   private final LEDS leds;
+  private final Limelight vision;
   // notes
   NoteVisuals noteVisuals = new NoteVisuals();
   // Controller
@@ -100,6 +105,7 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIOTalonFX() {});
         intakes = new Intakes(new IntakesIOTalonFX() {}, elevator);
         climb = new Climb(new ClimbIOTalonFX());
+        vision = new Limelight(new LimelightIO_MT2(), drive);
         break;
 
       case SIM:
@@ -114,6 +120,7 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIOSim());
         intakes = new Intakes(new IntakesIOSim(drive::getPose), elevator);
         climb = new Climb(new ClimbIOSim());
+        vision = new Limelight(new LimelightIOSim(), drive);
         break;
 
       default:
@@ -128,6 +135,7 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
         intakes = new Intakes(new IntakesIO() {}, elevator);
         climb = new Climb(new ClimbIO() {});
+        vision = new Limelight(new LimelightIO() {}, drive);
         break;
     }
 
@@ -222,12 +230,14 @@ public class RobotContainer {
     controller
         .leftBumper()
         .whileTrue(DriveCommands.autoDriveCommandTest(drive, new Pose2d(0, 0, new Rotation2d(0))));
+    Command ampCommand =
+        new SequentialCommandGroup(DriveCommands.driveToAmp(), intakes.AutoAmpOuttake());
+    Command HPCommand =
+        new SequentialCommandGroup(
+            DriveCommands.driveToHP(), intakes.AutoHPin(), intakes.setDown());
+    Command OTFcycleCommand = ampCommand.andThen(HPCommand).repeatedly();
 
-    controller
-        .a()
-        .whileTrue(
-            new SequentialCommandGroup(DriveCommands.driveToAmp(), intakes.AutoAmpOuttake())
-                .andThen(DriveCommands.driveToHP()));
+    controller.a().whileTrue(OTFcycleCommand);
 
     controller
         .leftTrigger()
@@ -236,7 +246,7 @@ public class RobotContainer {
                     DriveCommands.driveToHP(HPChoices.HP_LEFT),
                     intakes.AutoHPin(),
                     intakes.setDown())
-                .andThen(DriveCommands.driveToAmp()));
+                .andThen(OTFcycleCommand.asProxy()));
     controller
         .rightTrigger()
         .whileTrue(
@@ -244,7 +254,7 @@ public class RobotContainer {
                     DriveCommands.driveToHP(HPChoices.HP_RIGHT),
                     intakes.AutoHPin(),
                     intakes.setDown())
-                .andThen(DriveCommands.driveToAmp()));
+                .andThen(OTFcycleCommand.asProxy()));
 
     controller
         .rightTrigger()
@@ -254,7 +264,7 @@ public class RobotContainer {
                     DriveCommands.driveToHP(HPChoices.HP_MID),
                     intakes.AutoHPin(),
                     intakes.setDown())
-                .andThen(DriveCommands.driveToAmp()));
+                .andThen(OTFcycleCommand.asProxy()));
     // leds
     controller.rightBumper().whileTrue(leds.FlashOrange());
     controller.leftBumper().whileTrue(leds.FlashBlue());

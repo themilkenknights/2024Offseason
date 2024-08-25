@@ -35,8 +35,7 @@ import java.util.function.DoubleSupplier;
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
 
-  private DriveCommands() {
-  }
+  private DriveCommands() {}
 
   public static Command autoDriveCommandTest(Drive drive, Pose2d target) {
     AutoAlignController controller = new AutoAlignController(target);
@@ -48,8 +47,7 @@ public class DriveCommands {
   }
 
   /**
-   * Field relative drive command using two joysticks (controlling linear and
-   * angular velocities).
+   * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
   public static Command joystickDrive(
       Drive drive,
@@ -59,9 +57,11 @@ public class DriveCommands {
     return Commands.run(
         () -> {
           // Apply deadband
-          double linearMagnitude = MathUtil.applyDeadband(
-              Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()), DEADBAND);
-          Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+          double linearMagnitude =
+              MathUtil.applyDeadband(
+                  Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()), DEADBAND);
+          Rotation2d linearDirection =
+              new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
           double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 
           // Square values
@@ -69,13 +69,15 @@ public class DriveCommands {
           omega = Math.copySign(omega * omega, omega);
 
           // Calculate new linear velocity
-          Translation2d linearVelocity = new Pose2d(new Translation2d(), linearDirection)
-              .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
-              .getTranslation();
+          Translation2d linearVelocity =
+              new Pose2d(new Translation2d(), linearDirection)
+                  .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
+                  .getTranslation();
 
           // Convert to field relative speeds & send command
-          boolean isFlipped = DriverStation.getAlliance().isPresent()
-              && DriverStation.getAlliance().get() == Alliance.Red;
+          boolean isFlipped =
+              DriverStation.getAlliance().isPresent()
+                  && DriverStation.getAlliance().get() == Alliance.Red;
           drive.runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
@@ -127,21 +129,24 @@ public class DriveCommands {
     lastChoice = hp;
     // PathPlannerPath path = PathPlannerPath.fromPathFile(hp.toString());
     return AutoBuilder.pathfindThenFollowPath(
-        PathPlannerPath.fromPathFile(hp.toString()), new PathConstraints(3.7, 3.5, 360, 540))
+            PathPlannerPath.fromPathFile(hp.toString()), new PathConstraints(3.7, 3.5, 360, 540))
         .alongWith(new setLastHP(hp));
   }
 
-  private static Command HP_LEFT = AutoBuilder.pathfindThenFollowPath(
-      PathPlannerPath.fromPathFile(HPChoices.HP_LEFT.toString()),
-      new PathConstraints(3.7, 3.5, 360, 540));
+  private static Command HP_LEFT =
+      AutoBuilder.pathfindThenFollowPath(
+          PathPlannerPath.fromPathFile(HPChoices.HP_LEFT.toString()),
+          new PathConstraints(3.7, 3.5, 360, 540));
 
-  private static Command HP_MID = AutoBuilder.pathfindThenFollowPath(
-      PathPlannerPath.fromPathFile(HPChoices.HP_MID.toString()),
-      new PathConstraints(3.7, 3.5, 360, 540));
+  private static Command HP_MID =
+      AutoBuilder.pathfindThenFollowPath(
+          PathPlannerPath.fromPathFile(HPChoices.HP_MID.toString()),
+          new PathConstraints(3.7, 3.5, 360, 540));
 
-  private static Command HP_RIGHT = AutoBuilder.pathfindThenFollowPath(
-      PathPlannerPath.fromPathFile(HPChoices.HP_RIGHT.toString()),
-      new PathConstraints(3.7, 3.5, 360, 540));
+  private static Command HP_RIGHT =
+      AutoBuilder.pathfindThenFollowPath(
+          PathPlannerPath.fromPathFile(HPChoices.HP_RIGHT.toString()),
+          new PathConstraints(3.7, 3.5, 360, 540));
 
   public static Command driveToHP() {
 

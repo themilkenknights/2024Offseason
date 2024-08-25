@@ -178,6 +178,7 @@ src/main/java/frc/robot/BuildConstants.java
 .glb
 .gltf
 ascopeassets/Robot_Inversion/
+ascopeassets/Robot_Inversion
 ascopeassets/Robot_Inversion/model.glb
 ascopeassets/Robot_Inversion/model.glb
 ascopeassets/Robot_Inversion/model.gltf
