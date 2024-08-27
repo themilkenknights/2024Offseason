@@ -11,19 +11,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-/*
-         ______________
-        |[]            |
-        |  __________  |
-        |  | Radio  |  |
-        |  | Shack  |  |
-        |  |________|  |
-        |   ________   |
-        |   [ [ ]  ]   |
-        \___[_[_]__]___|
-    Remember to save often :)
- */
-
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
@@ -88,8 +75,6 @@ public class RobotContainer {
   NoteVisuals noteVisuals = new NoteVisuals();
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
-  //Second Controller
-  private final CommandXboxController controllerTwo = new CommandXboxController(1);
 
   // Dashboard inputs
 
@@ -153,13 +138,7 @@ public class RobotContainer {
         vision = new Limelight(new LimelightIO() {}, drive);
         break;
     }
-    /*
-      ,'"`.
-     /     \
-    :       :
-    :       :
-     `.___,'  Easter egg
-    */
+
     // create led subsystem after creating all the others
 
     leds = new LEDS(intakes::getBeambreak);
@@ -220,9 +199,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    //Elevator
-    controllerTwo.leftTrigger().whileTrue(elevator.addToGoal(-1));
-    controllerTwo.rightTrigger().whileTrue(elevator.addToGoal(1));
     // drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
