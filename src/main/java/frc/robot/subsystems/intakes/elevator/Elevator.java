@@ -60,13 +60,28 @@ public class Elevator extends SubsystemBase {
       this.value = value;
     }
   };
-
+  
   public InstantCommand setGoal(double goal) {
+    
     return new InstantCommand(() -> pidController.setGoal(goal));
   }
 
   public InstantCommand setGoal(Positions goal) {
     return new InstantCommand(() -> pidController.setGoal(goal.value));
+  }
+
+  public InstantCommand addToGoal(double goal) {
+    if (goal+pidController.getGoal().position>0){
+      if (goal+pidController.getGoal().position<140){
+        return new InstantCommand(() -> pidController.setGoal(goal+pidController.getGoal().position));
+      }
+      else {
+        return new InstantCommand(() -> pidController.setGoal(goal+pidController.getGoal().position));
+      }
+    }
+    else{
+      return new InstantCommand(() -> pidController.setGoal(0));
+    }
   }
 
   public Command goToPosition(Positions goal) {
