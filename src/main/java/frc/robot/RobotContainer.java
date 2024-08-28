@@ -89,7 +89,7 @@ public class RobotContainer {
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
   //Second Controller
-  private final CommandXboxController controllerTwo = new CommandXboxController(1);
+  private final CommandXboxController controllerOP = new CommandXboxController(1);
 
   // Dashboard inputs
 
@@ -221,8 +221,11 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     //Elevator
-    controllerTwo.leftTrigger().whileTrue(elevator.addToGoal(-1));
-    controllerTwo.rightTrigger().whileTrue(elevator.addToGoal(1));
+    // A on switch is where B on xbox is :( 
+       // same with x and y
+    controllerOP.y().onTrue(elevator.setGoal(140)); // Hewlett-Packard (HP)
+    controllerOP.b().onTrue(elevator.setGoal(130)); // Amp
+    controllerOP.a().onTrue(elevator.setGoal(0));   // Ground
     // drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
