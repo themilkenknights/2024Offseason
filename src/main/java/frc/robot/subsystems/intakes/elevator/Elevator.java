@@ -112,6 +112,9 @@ public class Elevator extends SubsystemBase {
     } else if (inputs.encoderValue < 60) {
       midStagePose = new Pose3d(0, 0, (((inputs.encoderValue) / Math.PI) / 80), new Rotation3d());
       lHeight = (((inputs.encoderValue + 80) / Math.PI) / 80);
+      // 15+15 is thirty
+      // 16+16 is thirty two
+      //    Wait what??
     }
     if (up & !(inputs.encoderValue > 60)) {
       midStagePose = new Pose3d();

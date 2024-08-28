@@ -166,6 +166,8 @@ public class Drive extends SubsystemBase {
           }
         });
     SmartDashboard.putData(
+        // Why did you divide sin by tan
+        //    Just cos
         "Gyro",
         new Sendable() {
           @Override

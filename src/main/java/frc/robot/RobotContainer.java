@@ -153,13 +153,6 @@ public class RobotContainer {
         vision = new Limelight(new LimelightIO() {}, drive);
         break;
     }
-    /*
-      ,'"`.
-     /     \
-    :       :
-    :       :
-     `.___,'  Easter egg
-    */
     // create led subsystem after creating all the others
 
     leds = new LEDS(intakes::getBeambreak);
@@ -223,11 +216,20 @@ public class RobotContainer {
     //Elevator
     // A on switch is where B on xbox is :( 
        // same with x and y
-    controllerOP.y().onTrue(elevator.setGoal(140)); // Hewlett and Packard are the HP
-    controllerOP.b().onTrue(elevator.setGoal(130)); // Amp
-    controllerOP.a().onTrue(elevator.setGoal(0));   // Ground
+    controllerOP.y().onTrue(elevator.setGoal(Elevator.Positions.HP)); 
+    controllerOP.b().onTrue(elevator.setGoal(Elevator.Positions.AUTO));
+    controllerOP.a().onTrue(elevator.setGoal(Elevator.Positions.GROUND));
 
-
+    // Intakes
+    controllerOP.povDown().whileTrue(intakes.setIntakesState(intakeStates.GROUNDOUT)).onFalse(intakes.setIntakesState(intakeStates.OFF));
+    controllerOP.povUp().whileTrue(intakes.setIntakesState(intakeStates.GROUND)).onFalse(intakes.setIntakesState(intakeStates.OFF));
+            // in ^
+    controllerOP.povRight().whileTrue(intakes.setIntakesState(intakeStates.IN)).onFalse(intakes.setIntakesState(intakeStates.OFF));
+    controllerOP.povLeft().whileTrue(intakes.setIntakesState(intakeStates.OUT)).onFalse(intakes.setIntakesState(intakeStates.OFF));
+    //Semiauto intakes
+    controllerOP.rightBumper().whileTrue(intakes.AutoAmpOuttake());
+    controllerOP.rightTrigger().whileTrue(intakes.AutoGroundIntake());
+    controllerOP.leftTrigger().whileTrue(intakes.AutoHPin());
     // drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
