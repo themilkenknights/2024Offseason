@@ -223,9 +223,11 @@ public class RobotContainer {
     //Elevator
     // A on switch is where B on xbox is :( 
        // same with x and y
-    controllerOP.y().onTrue(elevator.setGoal(140)); // Hewlett-Packard (HP)
+    controllerOP.y().onTrue(elevator.setGoal(140)); // Hewlett and Packard are the HP
     controllerOP.b().onTrue(elevator.setGoal(130)); // Amp
     controllerOP.a().onTrue(elevator.setGoal(0));   // Ground
+
+
     // drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
