@@ -1,0 +1,6 @@
+https://learn.adafruit.com/usb-plus-serial-backpack/command-reference
+https://first.wpi.edu/wpilib/allwpilib/docs/release/java/edu/wpi/first/wpilibj/SerialPort.html
+https://www.adafruit.com/product/782
+
+
+Subsystem for the subsystem code and util for the comms class
